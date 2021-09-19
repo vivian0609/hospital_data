@@ -1,1 +1,1 @@
-web: sh setup.sh && streamlit run vx_test.py
+web: sh setup.sh && streamlit run --server.enableCORS false vx_test.py
