@@ -158,7 +158,7 @@ if st.checkbox('源码获取'):
 	is_send_code = 1
 	my_sender = "1090421150@qq.com"
 	my_password = "wppyudpqzugyidcb"
-	file_path = r'E:\微信公众号\python\streamlit\share_code\share_code.zip'
+	file_path = 'share_code.zip'
 	my_file_from = "蓝魅紫熏-vivian" # 邮件发送方命名
 	my_file_to = login_name # 邮件接收方命名
 	my_email_Subject = "源码" # 邮件主题
