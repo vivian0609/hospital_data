@@ -1,4 +1,5 @@
 # cd到目标文件夹再运行，streamlit run vx_test.py
+# pipreqs ./ --encoding=utf8 获取所有依赖包信息
 import streamlit as st
 import pandas as pd
 import numpy as np

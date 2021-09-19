@@ -1,0 +1,6 @@
+openpyxl==2.6.1
+streamlit==0.88.0
+numpy==1.16.2
+requests==2.21.0
+pandas==0.24.2
+beautifulsoup4==4.10.0
