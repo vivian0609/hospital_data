@@ -1,1 +1,1 @@
-web: sh setup.sh && streamlit run vivian_app.py --server.headless true --server.enableXsrfProtection false --server.enableCORS false
+web: sh setup.sh && streamlit run vivian_app.py --server.headless true --server.enableXsrfProtection false --server.enableCORS false --server.port 8501
