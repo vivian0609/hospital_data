@@ -1,5 +1,8 @@
 mkdir -p ~/.streamlit/
 
+touch ~/.streamlit/config.toml
+touch ~/.streamlit/credentials.toml
+
 echo "\
 [general]\n\
 email = \"yanqiliang609@gmail.com\"\n\
