@@ -1,1 +1,1 @@
-web: sh setup.sh && streamlit run vivian_app.py
+web: sh streamlit run vivian_app.py
