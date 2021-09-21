@@ -137,7 +137,7 @@ try:
 	user_point = []
 	for i in range(0,len(title_list)):
 		title_list_tmp1 = title_list[i]
-		user_point_tmp1 = st.text_input(f'对序号为 {title_list_tmp1} 的话题感兴趣原因 or 您对该话题有啥想法？')
+		user_point_tmp1 = st.text_area(f'对序号为 {title_list_tmp1} 的话题感兴趣原因 or 您对该话题有啥想法？')
 		is_zhihu_report = st.selectbox('您是否会考虑前往知乎发表自己的想法？',('是', '否'))
 		user_point.append(user_point_tmp1)
 	# title_list,user_point,is_zhihu_report
