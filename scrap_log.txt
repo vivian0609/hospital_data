@@ -1,0 +1,2 @@
+login_name|date_now|time_now|job_type|is_python|is_streamlit|is_interest|interest_num|is_zhihu
+galaxy_vivian|2021-09-23|2021-09-23 20:40:44|是|是|否|全都感兴趣|5|1 

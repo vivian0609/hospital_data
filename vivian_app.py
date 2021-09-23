@@ -1,4 +1,4 @@
-# cd到目标文件夹再运行，streamlit run vivian-app.py
+# cd到目标文件夹再运行，streamlit run vivian_app.py
 # pipreqs ./ --encoding=utf8 获取所有依赖包信息
 import streamlit as st
 import pandas as pd
@@ -61,16 +61,21 @@ def base_research():
 
 # 添加外部链接
 def show_external_link(link, title):
-    href = f'<a href="{link}" title="{title}" target="_blank" rel="noopener noreferrer" data-za-not-track-link="true"><h2 class="HotItem-title">{title}</h2></a>'
-    return href
+	href = f'<a href="{link}" title="{title}" target="_blank" rel="noopener noreferrer" data-za-not-track-link="true"><h2 class="HotItem-title">{title}</h2></a>'
+	return href
 
 # 文件下载
 def get_binary_file_downloader_html(bin_file, file_label='File'):
-    with open(bin_file, 'rb') as f:
-    	data = f.read()
-    bin_str = base64.b64encode(data).decode()
-    href = f'<a href="data:application/octet-stream;base64,{bin_str}" download="{os.path.basename(bin_file)}">点击下载（电脑端才有效） {file_label}</a>'
-    return href
+	with open(bin_file, 'rb') as f:
+		data = f.read()
+	bin_str = base64.b64encode(data).decode()
+	href = f'<a href="data:application/octet-stream;base64,{bin_str}" download="{os.path.basename(bin_file)}">点击下载（浏览器才有效） {file_label}</a>'
+	return href
+
+@st.cache
+def convert_df(df):
+	# Cache the conversion to prevent computation on every rerun
+	return df.to_csv().encode('utf_8_sig')
 
 ######################################## 正文部分 ###########################################
 st.title('欢迎体验！！！')
@@ -84,15 +89,29 @@ job_type,is_python,is_streamlit,is_interest,interest_num = base_research()
 
 """-----------------------------------------------------"""
 """ ## 获取当天知乎top5热门话题 """
+if 'is_scraping' not in st.session_state:
+	st.session_state.is_scraping = 0
 is_zhihu = 0
 if st.checkbox('体验【知乎top5热门话题】实时爬取'):
 	is_zhihu = 1
-	result = pd.read_csv('result.txt',sep=',')
-	time_now = str(datetime.datetime.today().strftime("%Y-%m-%d %H:%M:%S"))
-	d1 = datetime.datetime.strptime(time_now, '%Y-%m-%d %H:%M:%S')
-	d2 = datetime.datetime.strptime(result['get_time'][0], '%Y-%m-%d %H:%M:%S')
-	delta = d1 - d2
-	if delta.seconds > 3600:
+	is_new_run = 0
+	
+	st.session_state.is_scraping += 1
+	if st.session_state.is_scraping == 1:
+		# 记录信息（只记录一次）
+		f = "scrap_log.txt"
+		with open(f, "a", encoding="utf-8") as file:   # "a"代表追加内容
+			file.write(login_name+'|'+date_now+'|'+time_now+'|'+job_type+'|'+is_python+'|'+is_streamlit+'|'+is_interest+'|'+str(interest_num)+'|'+str(is_zhihu)+ " "+"\n")
+
+	try:
+		result = pd.read_csv('result.txt',sep=',')
+		time_now = str(datetime.datetime.today().strftime("%Y-%m-%d %H:%M:%S"))
+		d1 = datetime.datetime.strptime(time_now, '%Y-%m-%d %H:%M:%S')
+		d2 = datetime.datetime.strptime(result['get_time'][0], '%Y-%m-%d %H:%M:%S')
+		delta = d1 - d2
+	except:
+		is_new_run = 1
+	if is_new_run == 1 or delta.seconds > 3600:
 		st.success('您满足实时爬取条件，以下将为你显示即时获取的知乎top5热门话题，点击链接可直接跳转查看')
 		# 需修改【ZhihuSpider.py】文件下的cookie设置
 		hot_zhihu = ZhihuSpider()
@@ -112,19 +131,26 @@ if st.checkbox('体验【知乎top5热门话题】实时爬取'):
 		result = result
 	for url,title in zip(result['url'],result['index'].astype(str)+'、'+result['title']):
 		st.markdown(show_external_link(url, title),unsafe_allow_html=True)
+
+	# 下载文件形式
+	# text_tmp = f'【知乎top5热门话题结果表】'
+	# st.markdown(get_binary_file_downloader_html('result.txt', text_tmp),unsafe_allow_html=True)
+	st.download_button(
+		label='点击下载【知乎top5热门话题最新结果表】', data=convert_df(result),
+		file_name='result.txt' , mime='text/csv')
 	
 st.warning('请知悉：若请求当时与上一次爬取相隔1个小时以上，可以启动实时爬取；否则显示的是当天已获取的最新内容')
 
 """-----------------------------------------------------"""
 """ ## 热门话题互动 """
-# 下载excel文件形式
-text_tmp = f'【知乎top5热门话题结果表】'
-st.markdown(get_binary_file_downloader_html('result.txt', text_tmp),unsafe_allow_html=True)
-
 if is_zhihu == 0:
 	try:
 		st.warning('注意：由于您未体验上述【知乎top5热门话题】实时爬取功能，则默认调取当天已获取的最新内容')
 		result = pd.read_csv('result.txt',sep=',')
+		# 下载文件形式
+		text_tmp = f'【知乎top5热门话题结果表】'
+		st.markdown(get_binary_file_downloader_html('result.txt', text_tmp),unsafe_allow_html=True)
+
 		with st.expander("当天已获取的最新内容，请自行展开查看："):
 			for url,title in zip(result['url'],result['index'].astype(str)+'、'+result['title']):
 				st.markdown(show_external_link(url, title),unsafe_allow_html=True)
@@ -150,11 +176,11 @@ except:
 
 """-----------------------------------------------------"""
 """ ## 源码获取 """
-user_log = pd.read_csv('user_log.txt', sep = '|')
 is_send_code = 0
 email = ''
 send_time = ''
 if st.checkbox('源码获取'):
+	user_log = pd.read_csv('user_log.txt', sep = '|')
 	is_send_code = 1
 	my_sender = "1090421150@qq.com"
 	my_password = "wppyudpqzugyidcb"
@@ -190,10 +216,10 @@ if submitted and my_receiver not in list(user_log['email']):
 			send_email = QQSendEmail(my_file_from,my_file_to,my_email_Subject,my_email_text,my_receiver,my_annex_path1,my_annex_name1)
 			send_email.final_send(my_sender,my_password)
 			send_time = str(datetime.datetime.today())
-		# 保存点击链接的每个人的操作填写记录
+		# 保存提交的每个人的操作填写记录
 		f = "user_log.txt"
-		interest_title = ','.join([str(i) for i in title_list])
-		user_point = ','.join(user_point)
+		interest_title = ';'.join([str(i) for i in title_list])
+		user_point = ';'.join(user_point)
 		with open(f, "a", encoding="utf-8") as file:   # "a"代表追加内容
 			file.write(login_name+'|'+date_now+'|'+time_now+'|'+str(user_id)+'|'+str(user_cnt)+'|'+job_type+'|'+is_python+'|'+is_streamlit+'|'+is_interest+'|'+str(interest_num)+'|'+str(is_zhihu)+'|'+interest_title+'|'+user_point+'|'+is_zhihu_report+'|'+str(is_send_code)+'|'+email+'|'+send_time + " "+"\n")
 		#st.success('成功！！！')
@@ -203,4 +229,3 @@ is_good = 0
 if st.button('客官，留个赞再走呀（说不定会有惊喜呢）'):
 	is_good = is_good + 1
 	st.balloons()
-
