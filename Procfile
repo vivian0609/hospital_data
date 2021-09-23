@@ -1,1 +1,1 @@
-web: sh setup.sh && streamlit run vivian_app.py --server.headless true
+web: sh setup.sh && streamlit run vivian_app.py --server.headless true --server.port $PORT --browser.serverAddress 0.0.0.0
