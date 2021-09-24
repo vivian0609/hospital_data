@@ -1,5 +1,4 @@
 # cd到目标文件夹再运行，streamlit run vivian_app.py
-# pip install --upgrade streamlit==0.74.0
 # pipreqs ./ --encoding=utf8 获取所有依赖包信息
 import streamlit as st
 import pandas as pd
@@ -10,14 +9,14 @@ import re
 import os
 import base64
 import math
-# from QQSendEmail import *
-# from ZhihuSpider import *
+from QQSendEmail import *
+from ZhihuSpider import *
 
 ######################################## 函数部分 ###########################################
 # 登录模块
 def user_login():
 	""" ## 登录模块 """
-	col1, col2 = st.beta_columns(2)
+	col1, col2 = st.columns(2)
 	with col1:
 		login_name = st.text_input('登录账号（微信昵称，方便统计）')
 	with col2:
@@ -38,7 +37,7 @@ def user_login():
 
 # 兴趣调研模块
 def base_research():
-	col1, col2, col3 = st.beta_columns(3)
+	col1, col2, col3 = st.columns(3)
 	with col1:
 		job_type = st.radio("1、您是否从事数据or技术类工作？",('是', '否'))
 	with col2:
@@ -136,9 +135,9 @@ if st.checkbox('体验【知乎top5热门话题】实时爬取'):
 	# 下载文件形式
 	# text_tmp = f'【知乎top5热门话题结果表】'
 	# st.markdown(get_binary_file_downloader_html('result.txt', text_tmp),unsafe_allow_html=True)
-	# st.download_button(
-	# 	label='点击下载【知乎top5热门话题最新结果表】', data=convert_df(result),
-	# 	file_name='result.txt' , mime='text/csv')
+	st.download_button(
+		label='点击下载【知乎top5热门话题最新结果表】', data=convert_df(result),
+		file_name='result.txt' , mime='text/csv')
 	
 st.warning('请知悉：若请求当时与上一次爬取相隔1个小时以上，可以启动实时爬取；否则显示的是当天已获取的最新内容')
 
@@ -152,7 +151,7 @@ if is_zhihu == 0:
 		text_tmp = f'【知乎top5热门话题结果表】'
 		st.markdown(get_binary_file_downloader_html('result.txt', text_tmp),unsafe_allow_html=True)
 
-		with st.beta_expander("当天已获取的最新内容，请自行展开查看："):
+		with st.expander("当天已获取的最新内容，请自行展开查看："):
 			for url,title in zip(result['url'],result['index'].astype(str)+'、'+result['title']):
 				st.markdown(show_external_link(url, title),unsafe_allow_html=True)
 	except:
