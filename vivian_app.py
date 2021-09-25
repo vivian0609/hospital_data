@@ -18,7 +18,7 @@ def user_login():
 	""" ## 登录模块 """
 	col1, col2 = st.columns(2)
 	with col1:
-		login_name = st.text_input('登录账号（微信昵称，方便统计）')
+		login_name = st.text_input('登录账号（微信昵称/简称，方便统计）')
 	with col2:
 		placeholder = st.empty()
 		login_password = placeholder.text_input('登录密码','123456')
@@ -26,6 +26,9 @@ def user_login():
 	# 判断登录者是否有权限、密码是否正确
 	if login_name == '' or login_password == '':
 		st.warning('请输入账号密码登录。')
+		st.stop()
+	elif len(login_name) < 3 or login_name == 'xxx':
+		st.warning('所输字符少于3个，请完整输入你的微信名/简称，其中【xxx】形式无效')
 		st.stop()
 	elif login_password != '123456':
 		st.warning('密码错误，请重新输入。若忘记密码，请联系管理员')
